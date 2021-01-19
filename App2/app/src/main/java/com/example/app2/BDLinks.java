@@ -16,6 +16,7 @@ public class BDLinks {
     public BDLinks(Context context) {
         //On crée la BDD et sa table :
         maBaseSQLite = new MaBaseSQLite(context,"Links",null, VERSION_BDD);
+
     }
 
     public void open(){
@@ -43,6 +44,12 @@ public class BDLinks {
         values.put("rate", link.getRate());
         //on insère l'objet dans la BDD via le ContentValues
         return bdd.insert("Links", null, values);
+    }
+
+    public long updateRate(int id, int rate) {
+        ContentValues values = new ContentValues();
+        values.put("rate", rate);
+        return bdd.update("Links", values, "id = ?", new String[]{String.valueOf(id)});
     }
 
     public ArrayList<Links> getAllLinks() {

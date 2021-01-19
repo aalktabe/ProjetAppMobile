@@ -9,7 +9,7 @@ public class MaBaseSQLite extends SQLiteOpenHelper {
     private final static String CREATE_TABLE =
             "create table Links(" +
                     "id integer primary key autoincrement," +
-                    "link varchar(50), " +
+                    "link varchar(50) unique, " +
                     "date varchar(20), " +
                     "rate integer);";
 
@@ -24,8 +24,10 @@ public class MaBaseSQLite extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db,int oldVersion, int newVersion){
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion){
         //On peut faire ce qu'on veut ici mais on va juste supprimer la table et la recréer
-        //db.execSQL("drop table Links;");
+        System.out.println("DROPPING THE TABLE");
+        db.execSQL("drop table Links;");
+        System.out.println("TABLE DROPPED");
     }
 }
