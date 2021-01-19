@@ -3,6 +3,7 @@ package com.example.app1;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import android.Manifest;
@@ -14,6 +15,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -105,13 +112,24 @@ public class MainActivity extends AppCompatActivity {
 
      private String rgbToHex() {
           // Génération de r,g,b
-          double r = Math.floor(Math.random() * Math.floor(255));
-          double g = Math.floor(Math.random() * Math.floor(255));
-          double b = Math.floor(Math.random() * Math.floor(255));
+          float r = (float) Math.floor(Math.random() * Math.floor(255));
+          float g = (float) Math.floor(Math.random() * Math.floor(255));
+          float b = (float)Math.floor(Math.random() * Math.floor(255));
           // Conversion rgbToHex
-          System.out.println("R: " + r + " G: " + g + " B: " + b);
-          return String.format("#%02X%02X%02X", (int)r, (int)g, (int)b);
+         System.out.println("R: " + r + " G: " + g + " B: " + b);
+         /***ColorMatrix cm = new ColorMatrix(new float[] {
+                 // Change red channel
+                 r, 0, 0, 0, 0,
+                 // Change green channel
+                 0, g, 0, 0, 0,
+                 // Change blue channel
+                 0, 0, b, 0, 0,
+                 // Keep alpha channel
+                 0, 0, 0, 1, 0,
+         });***/
+          //return cm;
           //return ((1 << 24) + ((int) r << 16) + ((int) g << 8) + b);
+         return String.format("#%02X%02X%02X", (int)r, (int)g, (int)b);
     }
 
     private void getcontact() {
@@ -120,11 +138,19 @@ public class MainActivity extends AppCompatActivity {
         while(cursor.moveToNext()) {
             String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
             String mobile = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-            arrayList.add(new Contact(name, mobile, rgbToHex()));
+            String cm = rgbToHex();
+            System.out.println(cm);
+            arrayList.add(new Contact(name, mobile, cm));
             View view = inflater.inflate(R.layout.contact_display, null);
             TextView tv_name = view.findViewById(R.id.name);
             tv_name.setText(name);
             TextView tv_number = view.findViewById(R.id.number);
+            TextView placeholder = view.findViewById(R.id.placeholder);
+            Drawable drawable = ContextCompat.getDrawable(this, R.drawable.square);
+            ColorDrawable cd = new ColorDrawable(Color.parseColor(cm));
+            drawable.setColorFilter(Color.parseColor(cm), PorterDuff.Mode.MULTIPLY);
+            placeholder.setBackground(drawable);
+            placeholder.setText("" + name.charAt(0) + "");
             tv_number.setText(mobile);
             tv_phonebook.addView(view);
             //tv_phonebook.setText(arrayList.toString());

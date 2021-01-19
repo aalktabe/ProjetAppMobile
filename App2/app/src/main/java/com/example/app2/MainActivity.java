@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
 //need this to prompts email client only
             email.setType("message/rfc822");
 
-            startActivity(email);
+            //startActivity(email);
 
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -134,8 +134,8 @@ public class MainActivity extends AppCompatActivity {
         SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yy");
         String date = formater.format(today);
         System.out.println(date);
-
-        Links LinkToInsert = new Links(link_text, date, 0);
+        String[] array = link_text.split("//");
+        Links LinkToInsert = new Links(array[1], date, 0);
         lastId = bdLinks.insertLink(LinkToInsert);
         bdLinks.close();
         Uri page = Uri.parse(link_text);

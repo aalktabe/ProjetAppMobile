@@ -4,29 +4,33 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_centerHorizontal="true">
-    <FrameLayout
+    <TextView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-        <CircleImageView
-            android:id="@+id/avatar"
-            android:layout_width="40dp"
-            android:layout_height="40dp" />
-    </FrameLayout>
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25px"
+        android:layout_marginLeft="20px"
+        android:textAlignment="center"
+        android:id="@+id/placeholder"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:gravity="center"></TextView>
+
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/name"
         android:layout_marginBottom="100px"
-        android:layout_marginTop="50px"
-        android:layout_marginLeft="100px"/>
+        android:layout_marginTop="40px"
+        android:textSize="20sp"
+        android:layout_marginLeft="200px"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/number"
         android:layout_marginRight="100px"
-        android:layout_marginTop="50px"
+        android:layout_marginTop="60px"
         android:layout_alignParentRight="true"
         />
     <View
