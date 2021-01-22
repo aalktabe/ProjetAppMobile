@@ -27,12 +27,15 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.ScrollView;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
@@ -87,6 +90,7 @@ class Contact {
 public class MainActivity extends AppCompatActivity {
     LinearLayout tv_phonebook;
     ArrayList<Contact> arrayList;
+    ArrayAdapter<String> arrayAdapter;
 
     // Initialize the Activity
     @Override
@@ -100,17 +104,46 @@ public class MainActivity extends AppCompatActivity {
         } else {
             getcontact();
         }
+        String contacts = "";
+        for (int i = 0; i < arrayList.size(); i++) {
+            contacts += arrayList.get(i).getName() + " " + arrayList.get(i).getNumber() + "\n";
+        }
+
+        arrayAdapter = new ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item, arrayList);
+
+        //ListView listView = findViewById(R.id.listView);
+        //listView.setAdapter(arrayAdapter);
 
         SharedPreferences preferences = getSharedPreferences("Contacts", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("contacts", arrayList.toString());
+        editor.putString("contacts", contacts);
         editor.apply();
 
         System.out.println("TEST PREFERENCES PARTAGEES: " + preferences.getString("contacts", null));
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        MenuItem menuItem = menu.findItem(R.id.search);
+        SearchView searchView = (SearchView) menuItem.getActionView();
+        searchView.setQueryHint("Search !");
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
 
-     private String rgbToHex() {
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                arrayAdapter.getFilter().filter(newText);
+                return true;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    private String rgbToHex() {
           // Génération de r,g,b
           float r = (float) Math.floor(Math.random() * Math.floor(255));
           float g = (float) Math.floor(Math.random() * Math.floor(255));

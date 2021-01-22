@@ -9,6 +9,8 @@
             android:layout_height="wrap_content"
             android:textSize="20sp"
             android:layout_marginLeft="20px"
+            android:clickable="true"
+            android:onClick="redirect"
             android:id="@+id/link" />
 
         <TextView

@@ -34,11 +34,6 @@ public class RatingPopUp extends DialogFragment {
                         Intent refresh = new Intent(getContext(), MainActivity.class);
                         startActivity(refresh);
                     }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int listenerId) {
-                        // User cancelled the dialog
-                    }
                 });
         // Create the AlertDialog object and return it
         return builder.create();

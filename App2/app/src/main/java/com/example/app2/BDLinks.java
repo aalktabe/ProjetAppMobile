@@ -37,13 +37,29 @@ public class BDLinks {
     }
 
     public long insertLink(Links link){
-        //Création d'un ContentValues (fonctionne comme une HashMap)
-        ContentValues values = new ContentValues();
-        values.put("link", link.getLink());
-        values.put("date", link.getDate());
-        values.put("rate", link.getRate());
-        //on insère l'objet dans la BDD via le ContentValues
-        return bdd.insert("Links", null, values);
+        Cursor cursor = bdd.rawQuery("SELECT * FROM Links WHERE link = ?", new String[]{link.getLink()});
+        if (cursor.moveToFirst()) {
+            System.out.println("!!!!!!!!!!!TEST BDLINKs!!!!!!!!!!!");
+            return cursor.getLong(cursor.getColumnIndex("id"));
+        }
+        else {
+            System.out.println("!!!!!!!!!!!FALSE!!!!!!!!!!!");
+            //Création d'un ContentValues (fonctionne comme une HashMap)
+            ContentValues values = new ContentValues();
+            values.put("link", link.getLink());
+            values.put("date", link.getDate());
+            values.put("rate", link.getRate());
+            //on insère l'objet dans la BDD via le ContentValues
+            return bdd.insert("Links", null, values);
+        }
+    }
+
+    public long getLastId() {
+        Cursor cursor = bdd.query("Links", new String[] {"id"}, null, null, null, null, "id DESC", "1");
+        if (cursor.moveToFirst()) {
+            return cursor.getLong(cursor.getColumnIndex("id"));
+        }
+        return 0;
     }
 
     public long updateRate(int id, int rate) {
@@ -54,7 +70,7 @@ public class BDLinks {
 
     public ArrayList<Links> getAllLinks() {
         ArrayList<Links> links = new ArrayList<>();
-        Cursor cursor = bdd.query("Links", new String[] {"link", "date", "rate"}, null, null, null, null, null, null);
+        Cursor cursor = bdd.query("Links", new String[] {"link", "date", "rate"}, null, null,null, null, "rate DESC", null);
         if (cursor == null) {
             System.out.println("Cursor vide");
             return null;

