@@ -108,11 +108,13 @@ public class MainActivity extends AppCompatActivity {
             linkVisited = false;
         }
         int rate = 5;
-        navigation.removeAllViews();
-        View divider = inflater.inflate(R.layout.rate_divider, null);
-        TextView rate_divider = divider.findViewById(R.id.rate_divider);
-        rate_divider.setText(rate + " stars");
-        navigation.addView(divider);
+        if (links.size() > 0) {
+            navigation.removeAllViews();
+            View divider = inflater.inflate(R.layout.rate_divider, null);
+            TextView rate_divider = divider.findViewById(R.id.rate_divider);
+            rate_divider.setText(rate + " stars");
+            navigation.addView(divider);
+        }
         for (int i = 0; i < links.size(); i++) {
             if (links.get(i).getRate() < rate) {
                 View divider2 = inflater.inflate(R.layout.rate_divider, null);
